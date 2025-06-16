@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -8,6 +8,12 @@ export default function Login() {
     email: "",
     password: "",
   });
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/profile", { replace: true });
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -75,7 +81,7 @@ export default function Login() {
             />
           </div>
           <div className="d-flex justify-content-center mb-3">
-            <button type="submit" className="btn btn-dark">
+            <button type="submit" className="btn btn-dark px-4">
               Login
             </button>
           </div>

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../utils/AuthProvider";
+import axios from "axios";
+
 export default function Profile() {
   const { logout, token } = useAuth();
   const [userData, setUserData] = useState(null);

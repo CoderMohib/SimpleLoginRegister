@@ -1,19 +1,22 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../utils/AuthProvider";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Login() {
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    if (isAuthenticated) {
       navigate("/profile", { replace: true });
     }
-  }, [navigate]);
+  }, [isAuthenticated]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -26,19 +29,29 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:3000/api/login", formData);
-      const { token } = res.data;
-      localStorage.setItem("token", token);
-      console.log("succuessfull", token);
+      const { message, token } = res.data;
+
+      login(token);
       setFormData({
         email: "",
         password: "",
       });
-      navigate("/profile", { replace: true });
     } catch (err) {
-      console.error(err);
-      setFormData({
-        password: "",
+      const errorMessage =
+        err.response?.data?.message || "Login failed. Please try again.";
+
+      toast.error(errorMessage, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        pauseOnHover: false,
+        draggable: true,
       });
+
+      setFormData((prev) => ({
+        ...prev,
+        password: "",
+      }));
     }
   };
 
@@ -95,6 +108,7 @@ export default function Login() {
           </p>
         </div>
       </div>
+      <ToastContainer/>
     </div>
   );
 }

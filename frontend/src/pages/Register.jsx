@@ -49,7 +49,7 @@ export default function Register() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (Object.keys(errors).length > 0) return;
+    // if (Object.keys(errors).length > 0) return;
     try {
       setIsSubmitting(true);
       await axios.post("http://localhost:3000/api/register", formData);
@@ -58,9 +58,10 @@ export default function Register() {
         autoClose: 3000,
       });
       setTimeout(() => {
-        navigate("/login");
+        navigate("/login",{replace:true});
       }, 3000);
     } catch (err) {
+      console.error(err);
       const errorMsg = err.response?.data?.message || "Registration failed";
       toast.error(errorMsg, {
         position: "top-right",
@@ -71,13 +72,13 @@ export default function Register() {
     }
   };
 
-  console.log(errors);
   const hasErrors = Object.values(errors).some((val) => val);
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
+    <div className="d-flex justify-content-center align-items-center vh-100 " >
       <div
         className="p-4 rounded shadow"
         style={{ width: "100%", maxWidth: "600px" }}
+
       >
         <h2 className="mb-4 text-center fw-bold">Register</h2>
         <form onSubmit={handleSubmit}>

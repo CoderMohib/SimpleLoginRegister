@@ -25,9 +25,13 @@ const register = async (req, res) => {
       insertedId: newUser._id,
     });
   } catch (err) {
+    console.error(err);
+    if (err.code === 11000) {
+      return res.status(409).json({ message: 'Username already exists' });
+    }
     res
       .status(500)
-      .json({ message: "Registration failed", error: err.message });
+      .json({ message: err.message || 'Internal Server Error' });
   }
 };
 module.exports = register;

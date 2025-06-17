@@ -1,20 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { useAuth } from "../utils/AuthProvider";
 export default function Profile() {
+  const { logout, token } = useAuth();
   const [userData, setUserData] = useState(null);
-  const navigate = useNavigate();
-
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if(!token){
-            navigate("/login", { replace: true });
-        }
         const res = await axios.get("http://localhost:3000/api/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -22,26 +16,32 @@ export default function Profile() {
         });
         setUserData(res.data.user);
       } catch (err) {
-        console.error("Error fetching profile", err);
+        console.log("Error: ", err);
       }
     };
 
     fetchProfile();
-  }, []);
+  }, [token]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
     toast.info("Logged out successfully", {
-      position: "top-right",
+      position: "top-center",
       autoClose: 2000,
+      hideProgressBar: true,
     });
+    setUserData(null);
     setTimeout(() => {
-      navigate("/login", { replace: true });
-    }, 2000);
+      logout();
+    }, 2100);
   };
 
   if (!userData) {
-    return <div className="text-center mt-5">Loading...</div>;
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-muted"> </div>
+        <ToastContainer />
+      </div>
+    );
   }
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">

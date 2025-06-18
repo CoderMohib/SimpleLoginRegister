@@ -2,11 +2,12 @@ const express = require("express");
 const router = express.Router();
 const login = require("../controllers/loginController");
 const register = require("../controllers/registerController");
-const getUserDate = require("../controllers/getUserController");
 const authUser = require("../middleware/user.auth");
 const getUserData = require("../controllers/getUserController");
+const verifyRefreshToken = require("../middleware/verifyRefreshToken");
+const refreshToken = require("../controllers/refreshTokenController");
 router.post("/api/register", register);
 router.post("/api/login", login);
 router.get("/api/profile", authUser, getUserData);
-
+router.post("/api/refresh", verifyRefreshToken, refreshToken);
 module.exports = router;

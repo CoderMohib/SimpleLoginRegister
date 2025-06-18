@@ -29,9 +29,8 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:3000/api/login", formData);
-      const { message, token } = res.data;
-
-      login(token);
+      const {token,refreshToken } = res.data;
+      login(token,refreshToken);
       setFormData({
         email: "",
         password: "",
@@ -39,7 +38,7 @@ export default function Login() {
     } catch (err) {
       const errorMessage =
         err.response?.data?.message || "Login failed. Please try again.";
-
+      console.error(err);
       toast.error(errorMessage, {
         position: "top-center",
         autoClose: 3000,

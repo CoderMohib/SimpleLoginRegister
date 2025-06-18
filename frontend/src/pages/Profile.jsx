@@ -5,24 +5,21 @@ import { useAuth } from "../utils/AuthProvider";
 import axios from "axios";
 
 export default function Profile() {
-  const { logout, token } = useAuth();
+  const { logout } = useAuth();
   const [userData, setUserData] = useState(null);
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get("http://localhost:3000/api/profile");
         setUserData(res.data.user);
       } catch (err) {
-        console.log("Error: ", err);
+        setUserData(null);
       }
     };
 
     fetchProfile();
-  }, [token]);
+  }, []);
 
   const handleLogout = () => {
     toast.info("Logged out successfully", {
@@ -76,6 +73,14 @@ export default function Profile() {
         <button className="btn btn-dark mt-3" onClick={handleLogout}>
           Logout
         </button>
+        {/* <button
+          className="btn btn-dark mt-3"
+          onClick={() => {
+            fetchProfile(setUserData);
+          }}
+        >
+          Refresh
+        </button> */}
       </div>
       <ToastContainer />
     </div>

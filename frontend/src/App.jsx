@@ -15,18 +15,18 @@ import PrivateRoutes from "./utils/PrivateRoutes";
 import axios from "axios";
 
 function App() {
-  axios.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-      console.log("Axios", error);
-      if (error.response && error.response.status === 401) {
-        console.log("inside");
-        localStorage.removeItem("token");
-        window.location.href = "/login";
-      }
-      return Promise.reject(error);
-    }
-  );
+  // axios.interceptors.response.use(
+  //   (response) => response,
+  //   async (error) => {
+  //     console.log("Axios", error);
+  //     if (error.response && error.response.status === 401) {
+  //       console.log("inside");
+  //       localStorage.removeItem("token");
+  //       window.location.href = "/login";
+  //     }
+  //     return Promise.reject(error);
+  //   }
+  // );
   return (
     <AuthProvider>
       <Router>

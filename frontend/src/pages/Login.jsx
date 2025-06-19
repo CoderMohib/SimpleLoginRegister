@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../utils/AuthProvider";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { showError } from "../utils/toastUtils";
 
 export default function Login() {
   const { login, isAuthenticated } = useAuth();
@@ -29,8 +28,8 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:3000/api/login", formData);
-      const {token,refreshToken } = res.data;
-      login(token,refreshToken);
+      const { token, refreshToken } = res.data;
+      login(token, refreshToken);
       setFormData({
         email: "",
         password: "",
@@ -38,15 +37,7 @@ export default function Login() {
     } catch (err) {
       const errorMessage =
         err.response?.data?.message || "Login failed. Please try again.";
-      console.error(err);
-      toast.error(errorMessage, {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: true,
-        pauseOnHover: false,
-        draggable: true,
-      });
-
+      showError(errorMessage);
       setFormData((prev) => ({
         ...prev,
         password: "",
@@ -107,7 +98,6 @@ export default function Login() {
           </p>
         </div>
       </div>
-      <ToastContainer/>
     </div>
   );
 }

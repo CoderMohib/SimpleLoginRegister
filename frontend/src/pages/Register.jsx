@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { showError, showSuccess } from "../utils/toastUtils";
 export default function Register() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -53,20 +52,14 @@ export default function Register() {
     try {
       setIsSubmitting(true);
       await axios.post("http://localhost:3000/api/register", formData);
-      toast.success("Registration successful!", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      showSuccess("Registration successful!");
       setTimeout(() => {
-        navigate("/login",{replace:true});
+        navigate("/login", { replace: true });
       }, 3000);
     } catch (err) {
       console.error(err);
       const errorMsg = err.response?.data?.message || "Registration failed";
-      toast.error(errorMsg, {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      showError(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -74,11 +67,10 @@ export default function Register() {
 
   const hasErrors = Object.values(errors).some((val) => val);
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 " >
+    <div className="d-flex justify-content-center align-items-center vh-100 ">
       <div
         className="p-4 rounded shadow"
         style={{ width: "100%", maxWidth: "600px" }}
-
       >
         <h2 className="mb-4 text-center fw-bold">Register</h2>
         <form onSubmit={handleSubmit}>
@@ -257,7 +249,6 @@ export default function Register() {
           </p>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 }

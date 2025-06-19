@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 const AuthContext = createContext();
-
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [refreshToken, setRefreshToken] = useState(
@@ -31,8 +30,6 @@ export const AuthProvider = ({ children }) => {
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
           return axios(originalRequest);
         } catch (tokenRefreshError) {
-          logout();
-          console.error("Token refresh failed", tokenRefreshError);
           return Promise.reject(tokenRefreshError);
         }
       }

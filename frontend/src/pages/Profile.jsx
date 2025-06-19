@@ -1,88 +1,128 @@
 import { useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../utils/AuthProvider";
 import axios from "axios";
+import { showError, showSuccess } from "../utils/toastUtils";
+import ProfileHeader from "../components/profile/ProfileHeader";
+import ReminderForm from "../components/profile/ProfileReminderForm";
+import ReminderList from "../components/profile/ReminderList";
 
 export default function Profile() {
   const { logout } = useAuth();
-  const [userData, setUserData] = useState(null);
+  const [userName, setUserName] = useState(null);
+  const [reminders, setReminders] = useState([]);
+  const [newReminder, setNewReminder] = useState({
+    title: "",
+    note: "",
+  });
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await axios.get("http://localhost:3000/api/profile");
-        setUserData(res.data.user);
-      } catch (err) {
-        setUserData(null);
+  const fetchProfile = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/profile");
+      setUserName(res.data?.user?.username);
+      const reminderRes = await axios.get(
+        "http://localhost:3000/api/profile/reminders"
+      );
+      console.log(reminderRes.data?.reminders);
+      setReminders(reminderRes.data?.reminders || []);
+    } catch (err) {
+      if (err.response?.status === 403) {
+        showError("Session expired! Logging out...");
+      } else {
+        showError("Failed to fetech data! Login Again");
       }
-    };
-
-    fetchProfile();
-  }, []);
-
-  const handleLogout = () => {
-    toast.info("Logged out successfully", {
-      position: "top-center",
-      autoClose: 2000,
-      hideProgressBar: true,
-    });
-    setUserData(null);
-    setTimeout(() => {
-      logout();
-    }, 2100);
+      setUserName(null);
+      setReminders(null);
+      setTimeout(logout, 3000);
+    }
   };
 
-  if (!userData) {
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+  const handleAddReminder = async () => {
+    if (!newReminder.title.trim()) return showError("Title is required!");
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/api/profile/reminders",
+        newReminder
+      );
+      setReminders([res.data.reminder, ...reminders]);
+      setNewReminder({
+        title: "",
+        note: "",
+      });
+      showSuccess("Reminder Added Successfully!");
+    } catch (err) {
+      console.error(err);
+      showError("Failed to add reminder");
+    }
+  };
+  const handleOnChange = (e) => {
+    setNewReminder((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  const handleDeleteReminder = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/profile/reminders/${id}`);
+      setReminders(reminders.filter((reminder) => reminder._id !== id));
+      showSuccess("Reminder deleted");
+    } catch (err) {
+      console.error(err);
+      if (err.response?.status === 403) {
+        showError("Session expired! Logging out...");
+        setUserName(null);
+        setReminders(null);
+        setTimeout(logout, 3000);
+      } else {
+        showError("Failed to delete");
+      }
+    }
+  };
+  const handleUpdateReminder = async (id, updatedData) => {
+    try {
+      const res = await axios.put(
+        `http://localhost:3000/api/profile/reminders/${id}`,
+        updatedData
+      );
+      const updated = res.data.updated;
+      setReminders((prev) =>
+        prev.map((reminder) => (reminder._id === id ? updated : reminder))
+      );
+      showSuccess("Reminder updated");
+    } catch (err) {
+      if (err.response?.status === 403) {
+        showError("Session expired! Logging out...");
+        setUserName(null);
+        setReminders(null);
+        setTimeout(logout, 3000);
+      } else {
+        showError("Failed to update reminder");
+      }
+    }
+  };
+
+  if (!userName || !reminders) {
     return (
       <div className="d-flex justify-content-center align-items-center vh-100">
         <div className="spinner-border text-muted"> </div>
-        <ToastContainer />
       </div>
     );
   }
   return (
-    <div className="container d-flex justify-content-center align-items-center vh-100">
-      <div
-        className="card shadow p-4"
-        style={{ maxWidth: "500px", width: "100%" }}
-      >
-        <h3 className="card-title text-center mb-4">User Profile</h3>
-        <div className="card-body">
-          <p>
-            <strong>Username:</strong> {userData.username}
-          </p>
-          <p>
-            <strong>Email:</strong> {userData.email}
-          </p>
-          <p>
-            <strong>Date of Birth:</strong>{" "}
-            {new Date(userData.dateOfBirth).toLocaleDateString()}
-          </p>
-          <p>
-            <strong>Gender:</strong> {userData.gender}
-          </p>
-          <p>
-            <strong>Age:</strong> {userData.age}
-          </p>
-          <p>
-            <strong>Joined:</strong>{" "}
-            {new Date(userData.createdAt).toLocaleDateString()}
-          </p>
-        </div>
-        <button className="btn btn-dark mt-3" onClick={handleLogout}>
-          Logout
-        </button>
-        {/* <button
-          className="btn btn-dark mt-3"
-          onClick={() => {
-            fetchProfile(setUserData);
-          }}
-        >
-          Refresh
-        </button> */}
-      </div>
-      <ToastContainer />
-    </div>
+    <>
+      <ProfileHeader userName={userName} />
+      <ReminderForm
+        onSubmit={handleAddReminder}
+        onChange={handleOnChange}
+        newReminder={newReminder}
+      />
+      <ReminderList
+        reminders={reminders}
+        onDelete={handleDeleteReminder}
+        onUpdate={handleUpdateReminder}
+      />
+    </>
   );
 }

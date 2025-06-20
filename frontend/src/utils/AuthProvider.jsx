@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
       const originalRequest = error.config;
       if (error.response.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
+        setRefreshToken(localStorage.getItem("refreshToken"));
         try {
           const response = await axios.post(
             "http://localhost:3000/api/refresh",
@@ -30,12 +31,17 @@ export const AuthProvider = ({ children }) => {
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
           return axios(originalRequest);
         } catch (tokenRefreshError) {
+          if (tokenRefreshError.response?.status === 403) {
+            showError("Session expired! Logging out...");
+            setTimeout(logout, 3000);
+          }
           return Promise.reject(tokenRefreshError);
         }
       }
       return Promise.reject(error);
     }
   );
+
   const login = (newToken, refreshToken) => {
     localStorage.setItem("token", newToken);
     localStorage.setItem("refreshToken", refreshToken);

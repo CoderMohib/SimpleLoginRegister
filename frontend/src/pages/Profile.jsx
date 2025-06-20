@@ -25,11 +25,7 @@ export default function Profile() {
       console.log(reminderRes.data?.reminders);
       setReminders(reminderRes.data?.reminders || []);
     } catch (err) {
-      if (err.response?.status === 403) {
-        showError("Session expired! Logging out...");
-      } else {
-        showError("Failed to fetech data! Login Again");
-      }
+      showError("Failed to fetech data! Login Again");
       setUserName(null);
       setReminders(null);
       setTimeout(logout, 3000);
@@ -69,15 +65,7 @@ export default function Profile() {
       setReminders(reminders.filter((reminder) => reminder._id !== id));
       showSuccess("Reminder deleted");
     } catch (err) {
-      console.error(err);
-      if (err.response?.status === 403) {
-        showError("Session expired! Logging out...");
-        setUserName(null);
-        setReminders(null);
-        setTimeout(logout, 3000);
-      } else {
-        showError("Failed to delete");
-      }
+      showError("Failed to delete");
     }
   };
   const handleUpdateReminder = async (id, updatedData) => {
@@ -92,14 +80,7 @@ export default function Profile() {
       );
       showSuccess("Reminder updated");
     } catch (err) {
-      if (err.response?.status === 403) {
-        showError("Session expired! Logging out...");
-        setUserName(null);
-        setReminders(null);
-        setTimeout(logout, 3000);
-      } else {
-        showError("Failed to update reminder");
-      }
+      showError("Failed to update reminder");
     }
   };
 

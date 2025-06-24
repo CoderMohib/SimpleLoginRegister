@@ -80,6 +80,7 @@ Create a `.env` file inside `/backend`:
 PORT=5000
 MONGO_URI=your_mongodb_connection
 JWT_SECRET=your_jwt_secret
+JWT_REFRESH=your_jwt_refresh_secret
 ```
 
 Run the backend:
@@ -97,11 +98,6 @@ cd ../frontend
 npm install
 ```
 
-Create a `.env` file inside `/frontend`:
-
-```env
-VITE_API_URL=http://localhost:5000/api
-```
 
 Run the frontend:
 

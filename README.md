@@ -47,7 +47,6 @@ SimpleLoginRegister/
 │   │   ├── App.jsx
 │   │   └── main.jsx
 │   ├── public/
-│   ├── .env
 │   ├── index.html
 │   └── package.json
 │

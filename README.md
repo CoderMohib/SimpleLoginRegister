@@ -118,24 +118,6 @@ npm run dev
 
 ---
 
-## 📦 .gitignore
-
-```gitignore
-# Node modules
-backend/node_modules/
-frontend/node_modules/
-
-# Build outputs
-frontend/dist/
-
-# Env files
-backend/.env
-frontend/.env
-
-# Logs and cache
-*.log
-.vscode/
-```
 
 ---
 
